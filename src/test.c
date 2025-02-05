@@ -8,18 +8,17 @@
  * @param M matrix
  * @param T matrix
  */    
-void test_performance(){
+void test_performance(int argc, char* argv[]){
     int rank, size;
+
+    MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     for(int mat_size = MIN_MAT_SIZE; mat_size <= MAX_MAT_SIZE; mat_size *= 2){
         // allocate matrices, only on rank 0
-        float** M = (rank == 0) ? new_mat(size) : NULL;
-        float** T = (rank == 0) ? new_mat(size) : NULL;
-
-        // broadcast matrix size to all processes
-        MPI_Bcast(&mat_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        float** M = (rank == 0) ? new_mat(mat_size) : NULL;
+        float** T = (rank == 0) ? new_mat(mat_size) : NULL;
 
         if (rank==0){
             // test symmetry check
@@ -33,8 +32,8 @@ void test_performance(){
                 // print_matrix(T, size);
 
                 // TASK 2: parallelization using MPI
-                checkSymMPI(M, size);
-                matTransposeMPI(M, T, mat_size);
+                checkSymMPI(M, mat_size, rank, size, MPI_COMM_WORLD);
+                matTransposeMPI(M, T, mat_size, rank, size, MPI_COMM_WORLD);
                 check_transpose(M, T, mat_size);
                 // print_matrix(T, size);
 
@@ -55,7 +54,7 @@ void test_performance(){
                 // print_matrix(T, size);
 
                 // TASK 2: parallelization using MPI
-                matTransposeMPI(M, T, mat_size);
+                matTransposeMPI(M, T, mat_size, rank, size, MPI_COMM_WORLD);
                 check_transpose(M, T, mat_size);
                 // print_matrix(T, size);
 
@@ -74,4 +73,6 @@ void test_performance(){
             free_mat(T, size);
         }
     }
+
+    MPI_Finalize();
 }

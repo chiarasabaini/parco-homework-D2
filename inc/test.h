@@ -9,9 +9,7 @@
 /**
  * @brief
  * 
- * @param M matrix
- * @param T matrix
  */
-void test_performance();
+void test_performance(int argc, char* argv[]);
 
 #endif // TEST_H
