@@ -1,0 +1,68 @@
+#!/bin/bash
+# Job name
+#PBS -N IPC_homework
+# Output files
+#PBS -o ./out/out.o
+#PBS -e ./out/err.e
+# Queue name
+#PBS -q short_cpuQ
+# Set the maximum wall time
+#PBS -l walltime=6:00:00
+# Number of nodes, cpus, and amount of memory
+#PBS -l select=1:ncpus=96:mpiprocs=96:mem=1024mb
+
+
+# --- SETUP ---
+
+# modules for C
+module load gcc91
+module load mpich-3.2.1--gcc-9.1.0
+
+# define gcc and g++ to use the version 9.1.0
+gcc() {
+    gcc-9.1.0 "$@"
+}
+
+gcc --version
+
+
+# --- NODES INFO ---
+
+# name of the file that contains the list of the nodes assigned to the job and list all the nodes
+NODES=$(cat $PBS_NODEFILE)
+echo The running nodes are $NODES
+
+# list of unique nodes assigned to the job
+NODES=$(sort -u $PBS_NODEFILE)
+echo The running nodes are $NODES
+
+# loop through each node and get architecture information
+for NODE in $NODES; do
+    echo "Node: $NODE"
+    ssh $NODE "lscpu"
+done
+
+
+# --- COMPILING AND RUNNING ---
+
+# select the working directory
+cd /home/chiara.sabaini/parco_lab/parco-homework/src/
+
+# compile the code
+mpicc utils.c matrix_operations.c test.c main.c -o ../bin/homework_exe -fopenmp -I ../inc/
+
+# change to executables directory
+cd /home/chiara.sabaini/parco_lab/parco-homework/bin/
+
+# run the code with different number of processors
+mpirun -np 1 ./homework_exe
+mpirun -np 2 ./homework_exe
+mpirun -np 4 ./homework_exe
+mpirun -np 8 ./homework_exe
+mpirun -np 16 ./homework_exe
+mpirun -np 32 ./homework_exe
+mpirun -np 64 ./homework_exe
+mpirun -np 96 ./homework_exe
+
+
+#qstat -n id
