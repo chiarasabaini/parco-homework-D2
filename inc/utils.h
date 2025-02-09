@@ -11,6 +11,7 @@
 
 #define MIN_MAT_SIZE 16
 #define MAX_MAT_SIZE 4096
+// #define LOG_DEBUG 1
 
 /**
  * @brief Functions that can be tested
@@ -57,7 +58,7 @@ const char* imp2str(impl_t implementation);
  * @param M matrix
  * @param n size of matrix M[n][n]
  */
-float** new_mat(int n);
+float** new_mat(int rows, int cols);
 
 
 /**
@@ -66,7 +67,7 @@ float** new_mat(int n);
  * @param M matrix
  * @param n size of matrix M[n][n]
  */
-void free_mat(float **M, int n);
+void free_mat(float **M, int rows);
 
 
 /**

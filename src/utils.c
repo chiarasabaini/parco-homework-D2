@@ -48,12 +48,12 @@ FILE* init_log(impl_t impl) {
     char time_string[32];
     strftime(time_string, 32, "%Y%m%d_%H%M%S", time_info);
 
-    int n_threads = atoi(getenv("OMP_NUM_THREADS"));
+    // int n_threads = atoi(getenv("OMP_NUM_THREADS"));
     int n_cpus;
     MPI_Comm_size(MPI_COMM_WORLD, &n_cpus);
 
     char filepath[255];
-    snprintf(filepath, 255, "../out/data/%s_%s_%d_log.csv", time_string, impl2str(impl), n_cpus);
+    snprintf(filepath, 255, "../out/data/%s_%s_%d_log.csv", time_string, imp2str(impl), n_cpus);
 
     FILE* log = fopen(filepath, "w");
     if (log == NULL) {
@@ -82,7 +82,7 @@ void print_log_seq(FILE* log, const char* msg, func_t func, impl_t imp, int size
         printf("%s:\n\tmatrix size: %d\nexecution time:%f\n", msg, size, execution_time);
     #endif
 
-    fprintf(log, "%d,%d,%s,%s,%0.9f\n", size, func2str(func), imp2str(imp), execution_time);
+    fprintf(log, "%d,%s,%s,%0.9f\n", size, func2str(func), imp2str(imp), execution_time);
 }
 
 
@@ -116,7 +116,7 @@ void close_log(FILE* log) {
 void print_matrix(float** M, int size) {
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            printf("%f ", M[i][j]);
+            printf("%f | ", M[i][j]);
         }
         printf("\n");
     }
@@ -125,11 +125,11 @@ void print_matrix(float** M, int size) {
 
 
 // MATRIX
-float** new_mat(int size) {
-    float** M = malloc(sizeof(float*) * size);
+float** new_mat(int rows, int cols) {
+    float** M = malloc(sizeof(float*) * rows);
 
-    for (int i = 0; i < size; i++) {
-            M[i] = malloc(sizeof(float) * size);
+    for (int i = 0; i < rows; i++) {
+            M[i] = malloc(sizeof(float) * cols);
     }
     return M;
 }
@@ -140,7 +140,7 @@ void init_mat(float** M, int n) {
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            M[i][j] = ((float)rand()) / RAND_MAX;
+            M[i][j] = abs((float)rand()) / RAND_MAX;
         }
     }
 }
@@ -161,11 +161,10 @@ void init_symmetric_mat(float** M, int n) {
 }
 
 
-void free_mat(float **M, int n) {
-    for (int i = 0; i < n; i++) {
+// function to free dynamically allocated memory for matrix
+void free_mat(float** M, int rows) {
+    for (int i = 0; i < rows; i++) {
         free(M[i]);
     }
-    
     free(M);
 }
-

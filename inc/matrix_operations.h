@@ -39,7 +39,7 @@ void matTranspose(float** M, float** T, int n);
  * @param n size of matrix M[n][n]
  * @return true if the matrix is symmetric, false otherwise
  */
-bool checkSymMPI(float** M, int n, int rank, int n_cpus, MPI_Comm comm);
+bool checkSymMPI(float** M, int n, int rank, int n_cpus);
 
 
 /**
@@ -49,9 +49,9 @@ bool checkSymMPI(float** M, int n, int rank, int n_cpus, MPI_Comm comm);
  * @param[in] n size of matrix M[n][n]
  * @param[out] T result of the transposition
  */
-void matTransposeMPI(float** M, float** T, int n, int rank, int n_cpus, MPI_Comm comm);
+void matTransposeMPI(float** M, float** T, int mat_size, int rank, int n_cpus);
 
-
+void matTransposeMPI_Bcast(float** M, float** T, int mat_size, int rank, int n_cpus);
 
 // TASK 4
 /**

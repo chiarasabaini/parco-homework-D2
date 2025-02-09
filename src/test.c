@@ -8,19 +8,17 @@
  * @param M matrix
  * @param T matrix
  */    
-void test_performance(int argc, char* argv[]){
-    int rank, size;
+void test_performance(int rank, int size){
 
-    MPI_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-    for(int mat_size = MIN_MAT_SIZE; mat_size <= MAX_MAT_SIZE; mat_size *= 2){
-        // allocate matrices, only on rank 0
-        float** M = (rank == 0) ? new_mat(mat_size) : NULL;
-        float** T = (rank == 0) ? new_mat(mat_size) : NULL;
+    //for(int mat_size = MIN_MAT_SIZE; mat_size <= MAX_MAT_SIZE; mat_size *= 2){
+        // allocate matrices
+        int mat_size = 4;
 
         if (rank==0){
+
+            float** M = new_mat(mat_size, mat_size);
+            float** T = new_mat(mat_size, mat_size);
+
             // test symmetry check
             for (int i = 0; i < 5; i++) {
                 init_symmetric_mat(M, mat_size);
@@ -32,8 +30,8 @@ void test_performance(int argc, char* argv[]){
                 // print_matrix(T, size);
 
                 // TASK 2: parallelization using MPI
-                checkSymMPI(M, mat_size, rank, size, MPI_COMM_WORLD);
-                matTransposeMPI(M, T, mat_size, rank, size, MPI_COMM_WORLD);
+                checkSymMPI(M, mat_size, rank, size);
+                matTransposeMPI(M, T, mat_size, rank, size);
                 check_transpose(M, T, mat_size);
                 // print_matrix(T, size);
 
@@ -54,25 +52,24 @@ void test_performance(int argc, char* argv[]){
                 // print_matrix(T, size);
 
                 // TASK 2: parallelization using MPI
-                matTransposeMPI(M, T, mat_size, rank, size, MPI_COMM_WORLD);
+                matTransposeMPI(M, T, mat_size, rank, size);
                 check_transpose(M, T, mat_size);
                 // print_matrix(T, size);
 
                 // TASK 4: parallelization using OMP
-                matTransposeMPI(M, T, mat_size);
+                matTransposeOMP(M, T, mat_size);
                 check_transpose(M, T, mat_size);
                 // print_matrix(T, size);
             }
+            // free matrices memory
+            if (M != NULL) {
+                free_mat(M, mat_size);
+            }
+            if (T != NULL) {
+                free_mat(T, mat_size);
+            }
         }
+    // }
 
-        // free matrices memory
-        if (M != NULL) {
-            free_mat(M, size);
-        }
-        if (T != NULL) {
-            free_mat(T, size);
-        }
-    }
 
-    MPI_Finalize();
 }

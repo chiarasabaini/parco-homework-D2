@@ -10,6 +10,6 @@
  * @brief
  * 
  */
-void test_performance(int argc, char* argv[]);
+void test_performance(int rank, int size);
 
 #endif // TEST_H
