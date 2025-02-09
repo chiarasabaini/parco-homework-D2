@@ -10,18 +10,18 @@
 
 
 // TASK 1
-bool checkSym(float** M, int n) {
+bool checkSym(float* M, int n) {
     double start = omp_get_wtime();
     bool isSym = true;
 
     for (int i = 0; i < n - 1; i++) {
         for (int j = i + 1; j < n; j++) {
-            if (M[i][j] != M[j][i]) {
+            if (M[i * n + j] != M[j * n + i]) { // Correct indexing for contiguous array
                 isSym = false;
                 break;
             }
         }
-        if (!isSym){
+        if (!isSym) {
             break;
         }
     }
@@ -33,24 +33,24 @@ bool checkSym(float** M, int n) {
 }
 
 
-void matTranspose(float** M, float** T, int n) {
+void matTranspose(float* M, float* T, int n) {
     double start = omp_get_wtime();
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            T[j][i] = M[i][j];
+            T[j * n + i] = M[i * n + j]; 
         }
     }
 
     double end = omp_get_wtime();
-    print_log_seq(seq_log, "Sequental Transposition", TRANSPOSITION, SEQUENTIAL, n, end - start);
+    print_log_seq(seq_log, "Sequential Transposition", TRANSPOSITION, SEQUENTIAL, n, end - start);
 }
 
 
 // TASK 2
-bool checkSymMPI(float** M, int n, int rank, int n_cpus) {
+bool checkSymMPI(float* M, int n, int rank, int n_cpus) {
     double start_total = MPI_Wtime();
-    
+
     int chunk_size = (n - 1) / n_cpus;
     int start_row = rank * chunk_size;
     int end_row = (rank == n_cpus - 1) ? (n - 1) : (start_row + chunk_size);
@@ -61,7 +61,7 @@ bool checkSymMPI(float** M, int n, int rank, int n_cpus) {
 
     for (int i = start_row; i <= end_row; ++i) {
         for (int j = i + 1; j < n; ++j) {
-            if (M[i][j] != M[j][i]) {
+            if (M[i * n + j] != M[j * n + i]) {  // Correct indexing for contiguous array
                 localSym = false;
                 break;
             }
@@ -85,7 +85,7 @@ bool checkSymMPI(float** M, int n, int rank, int n_cpus) {
 }
 
 // MPI Scatter - Gather with Datatypes
-void matTransposeMPI(float** M, float** T, int mat_size, int rank, int n_cpus) {
+void matTransposeMPI(float* M, float* T, int mat_size, int rank, int n_cpus) {
     double start_total = MPI_Wtime();
 
     int chunk_size = mat_size / n_cpus; // elements per chunk (columns per cpu)
@@ -109,17 +109,17 @@ void matTransposeMPI(float** M, float** T, int mat_size, int rank, int n_cpus) {
     }
 
     // scattering columns to all cpus
-    float** local_M = new_mat(chunk_size, mat_size);
+    float* local_M = new_mat(chunk_size, mat_size);
     MPI_Scatterv(M, counts, offset, resized_cols_type, local_M, chunk_size * mat_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
     //printf("Process %d received in local_matrix after SCATTERV:\n", rank);
     //print_matrix(local_M, N, chunk_size);
 
     // local chunk transpose
-    float** local_T = new_mat(mat_size, chunk_size);
+    float* local_T = new_mat(mat_size, chunk_size);
     double start_compute = MPI_Wtime();
     for (int i = 0; i < mat_size; i++) {
         for (int j = 0; j < chunk_size; j++) {
-            local_T[j][i] = local_M[i][j];
+            local_T[j * mat_size + i] = local_M[i * cols + j];
         }
     }
     double end_compute = MPI_Wtime();
@@ -131,7 +131,7 @@ void matTransposeMPI(float** M, float** T, int mat_size, int rank, int n_cpus) {
 
     free_mat(local_M, chunk_size);
     free_mat(local_T, mat_size);
-    // MPI_Type_free(&resized_cols_type);
+    MPI_Type_free(&resized_cols_type);
 
     double end_total = MPI_Wtime();
     print_log_mpi(mpi_log, "MPI Parallelized Transposition", TRANSPOSITION, MPI, mat_size, n_cpus, end_total - start_total, end_compute - start_compute);
@@ -139,7 +139,7 @@ void matTransposeMPI(float** M, float** T, int mat_size, int rank, int n_cpus) {
 
 
 // MPI Broadcast
-void matTransposeMPI_Bcast(float** M, float** T, int mat_size, int rank, int n_cpus){
+void matTransposeMPI_Bcast(float* M, float* T, int mat_size, int rank, int n_cpus){
     double start_total = MPI_Wtime();
 
     int chunk_size = mat_size / n_cpus;
@@ -156,10 +156,10 @@ void matTransposeMPI_Bcast(float** M, float** T, int mat_size, int rank, int n_c
     // local chunk transpose
     double start_compute = MPI_Wtime();
 
-    float** local_T = new_mat(chunk_size, mat_size);
+    float* local_T = new_mat(chunk_size, mat_size);
     for (int i = start; i < end; i++) {
         for (int j = 0; j < mat_size; j++) {
-            local_T[i - start][j] = M[j][i];
+            local_T[(i - start) * mat_size + j] = M[j * mat_size + i];
         }
     }
 
@@ -168,7 +168,7 @@ void matTransposeMPI_Bcast(float** M, float** T, int mat_size, int rank, int n_c
     // gather transposed chunk
     MPI_Gather(local_T,  chunk_size * mat_size, MPI_FLOAT, T, chunk_size * mat_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
-//     free_mat(local_T, mat_size);
+    free_mat(local_T, mat_size);
     if (rank != 0) {
         free_mat(M, mat_size);
     }
@@ -179,7 +179,7 @@ void matTransposeMPI_Bcast(float** M, float** T, int mat_size, int rank, int n_c
 
 
 // TASK 4
-bool checkSymOMP(float** M, int n) {
+bool checkSymOMP(float* M, int n) {
     double start = omp_get_wtime();
 
     int i;
@@ -190,7 +190,7 @@ bool checkSymOMP(float** M, int n) {
 
         #pragma omp parallel for collapse(1) reduction(&:isSym)
         for (int j = i + 1; j < n; j++) {
-            if (M[i][j] != M[j][i]) {
+            if (M[i * n + j] != M[j * n + i]) {
                 isSym = false;
             }
         }
@@ -204,7 +204,7 @@ bool checkSymOMP(float** M, int n) {
 }
 
 
-void matTransposeOMP(float** M, float** T, int n){
+void matTransposeOMP(float* M, float* T, int n){
     double start = omp_get_wtime();
 
     int i, j;
@@ -212,7 +212,7 @@ void matTransposeOMP(float** M, float** T, int n){
     #pragma omp parallel for collapse(2)
     for (i=0; i < n; i++) {
         for (j=0; j < n; j++) {
-            T[j][i] = M[i][j];
+            T[j * n + i] = M[i * n + j];
         }
     }
 
@@ -224,10 +224,10 @@ void matTransposeOMP(float** M, float** T, int n){
 
 
 // TEST
-bool check_transpose(float** M, float** T, int size){
+bool check_transpose(float* M, float* T, int size){
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            if (M[i][j] != T[j][i]) {
+            if (M[i * size + j] != T[j * size + i]) {
                 printf("TRANSPOSITION WENT WRONG!\n");
                 return false;
             }

@@ -114,10 +114,10 @@ void close_log(FILE* log) {
 }
 
 
-void print_matrix(float** M, int size) {
+void print_matrix(float* M, int size) {
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            printf("%f | ", M[i][j]);
+            printf("%f | ", M[i * size + j]);
         }
         printf("\n");
     }
@@ -126,36 +126,33 @@ void print_matrix(float** M, int size) {
 
 
 // MATRIX
-float** new_mat(int rows, int cols) {
-    float** M = malloc(sizeof(float*) * rows);
+float* new_mat(int rows, int cols) {
+    float* M = malloc(sizeof(float) * rows * cols);
 
-    for (int i = 0; i < rows; i++) {
-            M[i] = malloc(sizeof(float) * cols);
-    }
     return M;
 }
 
 
-void init_mat(float** M, int n) {
+void init_mat(float* M, int n) {
     srand(time(NULL));
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            M[i][j] = fabs((float)rand()) / RAND_MAX;
+            M[i * n + j] = fabs((float)rand()) / RAND_MAX; // Correct indexing
         }
     }
 }
 
 
-void init_symmetric_mat(float** M, int n) {
+void init_symmetric_mat(float* M, int n) {
     srand(time(NULL));
 
     for (int i = 0; i < n; i++) {
         for (int j = i; j < n; j++) {
-            M[i][j] = ((float)rand()) / RAND_MAX;
+            M[i * n + j] = ((float)rand()) / RAND_MAX;
 
-            if(i != j) { // off diagonal elements
-                M[j][i] = M[i][j];
+            if (i != j) { // off-diagonal elements
+                M[j * n + i] = M[i * n + j];
             }
         }
     }
@@ -163,9 +160,6 @@ void init_symmetric_mat(float** M, int n) {
 
 
 // function to free dynamically allocated memory for matrix
-void free_mat(float** M, int rows) {
-    for (int i = 0; i < rows; i++) {
-        free(M[i]);
-    }
-    // free(M);
+void free_mat(float* M, int rows) {
+    free(M);
 }

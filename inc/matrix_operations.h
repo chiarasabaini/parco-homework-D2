@@ -18,7 +18,7 @@
  * @param n size of matrix M[n][n]
  * @return true if the matrix is symmetric, false otherwise
  */
-bool checkSym(float** M, int n);
+bool checkSym(float* M, int n);
 
 
 /**
@@ -28,7 +28,7 @@ bool checkSym(float** M, int n);
  * @param[in] n size of matrix M[n][n]
  * @param[out] T result of the transposition
  */
-void matTranspose(float** M, float** T, int n);
+void matTranspose(float* M, float* T, int n);
 
 
 // TASK 2
@@ -39,7 +39,7 @@ void matTranspose(float** M, float** T, int n);
  * @param n size of matrix M[n][n]
  * @return true if the matrix is symmetric, false otherwise
  */
-bool checkSymMPI(float** M, int n, int rank, int n_cpus);
+bool checkSymMPI(float* M, int n, int rank, int n_cpus);
 
 
 /**
@@ -49,9 +49,9 @@ bool checkSymMPI(float** M, int n, int rank, int n_cpus);
  * @param[in] n size of matrix M[n][n]
  * @param[out] T result of the transposition
  */
-void matTransposeMPI(float** M, float** T, int mat_size, int rank, int n_cpus);
+void matTransposeMPI(float* M, float* T, int mat_size, int rank, int n_cpus);
 
-void matTransposeMPI_Bcast(float** M, float** T, int mat_size, int rank, int n_cpus);
+void matTransposeMPI_Bcast(float* M, float* T, int mat_size, int rank, int n_cpus);
 
 // TASK 4
 /**
@@ -61,7 +61,7 @@ void matTransposeMPI_Bcast(float** M, float** T, int mat_size, int rank, int n_c
  * @param n size of matrix M[n][n]
  * @return true if the matrix is symmetric, false otherwise
  */
-bool checkSymOMP(float** M, int n);
+bool checkSymOMP(float* M, int n);
 
 
 /**
@@ -71,7 +71,7 @@ bool checkSymOMP(float** M, int n);
  * @param[in] n size of matrix M[n][n]
  * @param[out] T result of the transposition
  */
-void matTransposeOMP(float** M, float** T, int n);
+void matTransposeOMP(float* M, float* T, int n);
 
 
 // TEST
@@ -83,7 +83,7 @@ void matTransposeOMP(float** M, float** T, int n);
  * @param size size of given matrices
  * @return true if it's been trasposed correctly, false otherwise
  */
-bool check_transpose(float **M, float **T, int size);
+bool check_transpose(float* M, float* T, int size);
 
 
 #endif // MATRIX_OPERATIONS_H

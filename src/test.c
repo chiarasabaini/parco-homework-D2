@@ -16,8 +16,8 @@ void test_performance(int rank, int size){
 
         if (rank==0){
 
-            float** M = new_mat(mat_size, mat_size);
-            float** T = new_mat(mat_size, mat_size);
+            float* M = new_mat(mat_size, mat_size);
+            float* T = new_mat(mat_size, mat_size);
 
             // test symmetry check
             for (int i = 0; i < 5; i++) {

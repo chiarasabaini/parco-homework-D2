@@ -58,7 +58,7 @@ const char* imp2str(impl_t implementation);
  * @param M matrix
  * @param n size of matrix M[n][n]
  */
-float** new_mat(int rows, int cols);
+float* new_mat(int rows, int cols);
 
 
 /**
@@ -67,7 +67,7 @@ float** new_mat(int rows, int cols);
  * @param M matrix
  * @param n size of matrix M[n][n]
  */
-void free_mat(float **M, int rows);
+void free_mat(float* M, int rows);
 
 
 /**
@@ -76,7 +76,7 @@ void free_mat(float **M, int rows);
  * @param M matrix
  * @param n size of matrix M[n][n]
  */
-void init_mat(float** M, int n);
+void init_mat(float* M, int n);
 
 
 /**
@@ -85,7 +85,7 @@ void init_mat(float** M, int n);
  * @param M matrix
  * @param n size of matrix M[n][n]
  */
-void init_symmetric_mat(float** M, int n);
+void init_symmetric_mat(float* M, int n);
 
 
 // LOG
