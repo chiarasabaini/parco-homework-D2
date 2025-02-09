@@ -46,13 +46,13 @@ done
 # --- COMPILING AND RUNNING ---
 
 # select the working directory
-cd /home/chiara.sabaini/parco_lab/parco-homework/src/
+cd /home/chiara.sabaini/parco_lab/parco-homework-D2/src/
 
 # compile the code
 mpicc utils.c matrix_operations.c test.c main.c -o ../bin/homework_exe -fopenmp -I ../inc/
 
 # change to executables directory
-cd /home/chiara.sabaini/parco_lab/parco-homework/bin/
+cd /home/chiara.sabaini/parco_lab/parco-homework-D2/bin/
 
 # run the code with different number of processors
 for num_procs in 1 2 4 8 16 32 64 96; do
