@@ -93,10 +93,11 @@ void matTransposeMPI(float** M, float** T, int mat_size, int rank, int n_cpus) {
     // create datatype to scatter
     MPI_Datatype cols_type, resized_cols_type;
     MPI_Type_vector(mat_size, // n blocks of contiguous elements (one for each row)
-                    chunk_size, mat_size, // offset between start of block N and start of block N+1 (matrix width)
+                    chunk_size, // elements in each block (columns per cpu)
+                    mat_size, // offset between start of block N and start of block N+1 (matrix width)
                     MPI_FLOAT, &cols_type);
-    MPI_Type_create_resized(cols_type, 0, chunk_size * sizeof(float), // bytes for each block (elements in block * size of each element)
-                            &resized_cols_type);
+    MPI_Type_create_resized(cols_type, 0, chunk_size * sizeof(float), &resized_cols_type); // bytes for each block (elements in block * size of each element)
+
     MPI_Type_commit(&resized_cols_type);
 
     int counts[n_cpus], offset[n_cpus];
