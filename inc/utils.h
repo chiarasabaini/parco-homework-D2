@@ -43,12 +43,22 @@ typedef enum {
 } impl_t;
 
 /**
+ * @brief types of MPI that can be tested
+ */
+typedef enum {
+    SCATTER = 0,
+    BROADCAST = 1,
+    REDUCE = 2,
+    N_MPI_IMPLEMENTATIONS
+} mpi_t;
+
+/**
  * @brief Convert imp_t to string
  * 
  * @param implementation implementation type
  * @return const char* 
  */
-const char* imp2str(impl_t implementation);
+const char* mpi2str(mpi_t mpi_type);
 
 // MATRIX
 
@@ -151,6 +161,6 @@ void print_log_omp(FILE *log, const char *msg, func_t func, impl_t imp, int size
  * @param execution_time_tot time elapsed between start and end of the function
  * @param execution_time_no_msg time elapsed between start and end of the function, not counting the time needed to pass messages
  */
-void print_log_mpi(FILE* log, const char* msg, func_t func, impl_t imp, int size, int n_cpus, double execution_time_tot, double execution_time_no_msg);
+void print_log_mpi(FILE* log, const char* msg, func_t func, impl_t imp, mpi_t mpi_type, int size, int n_cpus, double execution_time_tot, double execution_time_no_msg);
 
 #endif // UTILS_H

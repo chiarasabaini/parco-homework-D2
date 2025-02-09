@@ -79,7 +79,7 @@ bool checkSymMPI(float* M, int n, int rank, int n_cpus) {
     MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have finished before timing ends
 
     double end_total = MPI_Wtime();
-    print_log_mpi(mpi_log, "MPI Parallelized Symmetry Check", SYMMETRY, MPI, n, n_cpus, end_total - start_total, end_compute - start_compute);
+    print_log_mpi(mpi_log, "MPI Parallelized Symmetry Check", SYMMETRY, MPI, REDUCE, n, n_cpus, end_total - start_total, end_compute - start_compute);
 
     return isSym;
 }
@@ -134,7 +134,7 @@ void matTransposeMPI(float* M, float* T, int mat_size, int rank, int n_cpus) {
     MPI_Type_free(&resized_cols_type);
 
     double end_total = MPI_Wtime();
-    print_log_mpi(mpi_log, "MPI Parallelized Transposition", TRANSPOSITION, MPI, mat_size, n_cpus, end_total - start_total, end_compute - start_compute);
+    print_log_mpi(mpi_log, "MPI Parallelized Transposition", TRANSPOSITION, MPI, SCATTER, mat_size, n_cpus, end_total - start_total, end_compute - start_compute);
 }
 
 
@@ -174,7 +174,7 @@ void matTransposeMPI_Bcast(float* M, float* T, int mat_size, int rank, int n_cpu
     }
 
     double end_total = MPI_Wtime();
-    print_log_mpi(mpi_log, "MPI Parallelized Transposition", TRANSPOSITION, MPI, mat_size, n_cpus, end_total - start_total, end_compute - start_compute);
+    print_log_mpi(mpi_log, "MPI Parallelized Transposition", TRANSPOSITION, MPI, BROADCAST, mat_size, n_cpus, end_total - start_total, end_compute - start_compute);
 }
 
 

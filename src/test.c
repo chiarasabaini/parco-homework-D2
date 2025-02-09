@@ -51,6 +51,9 @@ void test_performance(int rank, int size){
                 // TASK 2: parallelization using MPI
                 matTransposeMPI(M, T, mat_size, rank, size);
                 check_transpose(M, T, mat_size);
+
+                matTransposeMPI_Bcast(M, T, mat_size, rank, size);
+                check_transpose(M, T, mat_size);
                 // print_matrix(T, size);
 
                 // TASK 4: parallelization using OMP

@@ -32,6 +32,18 @@ const char* imp2str(impl_t implementation) {
     }
 }
 
+const char* mpi2str(mpi_t mpi_type) {
+    switch (mpi_type) {
+        case SCATTER:
+            return "SCATTER";
+        case BROADCAST:
+            return "BROADCAST";
+        case REDUCE:
+            return "REDUCE";
+        default:
+            return "UNKNOWN";
+    }
+}
 
 // LOG
 
@@ -65,7 +77,7 @@ FILE* init_log(impl_t impl) {
             fprintf(log, "Matrix Size,Function,Implementation,Execution Time\n");
             break;
         case MPI:
-            fprintf(log, "Matrix Size,CPUs,Function,Implementation,Execution Time (total), Execution Time (no msg)\n");
+            fprintf(log, "Matrix Size,CPUs,Function,Implementation,MPI Implementation,Execution Time (total), Execution Time (no msg)\n");
             break;
         case OMP:
             fprintf(log, "Matrix Size,Threads,Function,Implementation,Execution Time\n");
@@ -97,13 +109,13 @@ void print_log_omp(FILE* log, const char* msg, func_t func, impl_t imp, int size
 }
 
 
-void print_log_mpi(FILE* log, const char* msg, func_t func, impl_t imp, int size, int n_cpus, double execution_time_tot, double execution_time_no_msg) {
+void print_log_mpi(FILE* log, const char* msg, func_t func, impl_t imp, mpi_t mpi_type, int size, int n_cpus, double execution_time_tot, double execution_time_no_msg) {
 
     #if LOG_DEBUG == 1
         printf("%s:\n\tmatrix size: %d\n\tn_cpus: %d\n\texecution time tot:%f\n\texecution time no msg:%f\n", msg, size, n_cpus, execution_time_tot, execution_time_no_msg);
     #endif
 
-    fprintf(log, "%d,%d,%s,%s,%0.9f\n", size, n_cpus, func2str(func), imp2str(imp), execution_time_tot, execution_time_no_msg);
+    fprintf(log, "%d,%d,%s,%s,%s,%0.9f\n", size, n_cpus, func2str(func), imp2str(imp), mpi2str(mpi_type), execution_time_tot, execution_time_no_msg);
 }
 
 
