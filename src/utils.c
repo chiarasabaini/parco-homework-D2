@@ -140,7 +140,7 @@ void init_mat(float** M, int n) {
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            M[i][j] = abs((float)rand()) / RAND_MAX;
+            M[i][j] = fabs((float)rand()) / RAND_MAX;
         }
     }
 }
@@ -166,5 +166,5 @@ void free_mat(float** M, int rows) {
     for (int i = 0; i < rows; i++) {
         free(M[i]);
     }
-    free(M);
+    // free(M);
 }

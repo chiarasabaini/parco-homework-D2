@@ -73,7 +73,7 @@ bool checkSymMPI(float** M, int n, int rank, int n_cpus) {
 
     double end_compute = MPI_Wtime();
 
-    bool isSym;
+    bool isSym = false;
     MPI_Allreduce(&localSym, &isSym, 1, MPI_C_BOOL, MPI_LAND, MPI_COMM_WORLD);
 
     MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have finished before timing ends
@@ -128,9 +128,9 @@ void matTransposeMPI(float** M, float** T, int mat_size, int rank, int n_cpus) {
     // gather transposed chunk
     MPI_Gather(local_T, mat_size * chunk_size, MPI_FLOAT, T, mat_size * chunk_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
-    free_mat(local_M, mat_size);
+    free_mat(local_M, chunk_size);
     free_mat(local_T, mat_size);
-    MPI_Type_free(&resized_cols_type);
+    // MPI_Type_free(&resized_cols_type);
 
     double end_total = MPI_Wtime();
     print_log_mpi(mpi_log, "MPI Parallelized Transposition", TRANSPOSITION, MPI, mat_size, n_cpus, end_total - start_total, end_compute - start_compute);
@@ -196,7 +196,7 @@ bool checkSymOMP(float** M, int n) {
     }
 
     double end = omp_get_wtime();
-    int n_threads = atoi(getenv("OMP_NUM_THREADS"));
+    int n_threads = getenv("OMP_NUM_THREADS");
     print_log_omp(omp_log, "OMP Parallelized Symmetry Check", SYMMETRY, OMP, n, n_threads, end - start);
 
     return isSym;
@@ -217,7 +217,7 @@ void matTransposeOMP(float** M, float** T, int n){
 
 
     double end = omp_get_wtime();
-    int n_threads = atoi(getenv("OMP_NUM_THREADS"));
+    int n_threads = getenv("OMP_NUM_THREADS");
     print_log_omp(omp_log, "OMP Parallelized Transposition", TRANSPOSITION, OMP, n, n_threads, end - start);
 }
 
