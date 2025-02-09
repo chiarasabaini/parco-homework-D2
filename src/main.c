@@ -23,8 +23,6 @@ int main(int argc, char* argv[]) {
     //     test_performance(rank, size);
     // }
 
-    omp_set_num_threads(4);
-
     test_performance(rank, size);
     
     MPI_Barrier(MPI_COMM_WORLD);
