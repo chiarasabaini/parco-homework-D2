@@ -10,10 +10,7 @@
  */    
 void test_performance(int rank, int size){
 
-    //for(int mat_size = MIN_MAT_SIZE; mat_size <= MAX_MAT_SIZE; mat_size *= 2){
-        // allocate matrices
-        int mat_size = 4;
-
+    for(int mat_size = MIN_MAT_SIZE; mat_size <= MAX_MAT_SIZE; mat_size *= 2){
         if (rank==0){
 
             float* M = new_mat(mat_size, mat_size);
@@ -69,7 +66,7 @@ void test_performance(int rank, int size){
                 free_mat(T, mat_size);
             }
         }
-    // }
+    }
 
 
 }
