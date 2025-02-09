@@ -196,7 +196,7 @@ bool checkSymOMP(float** M, int n) {
     }
 
     double end = omp_get_wtime();
-    int n_threads = getenv("OMP_NUM_THREADS");
+    int n_threads = atoi(getenv("OMP_NUM_THREADS"));
     print_log_omp(omp_log, "OMP Parallelized Symmetry Check", SYMMETRY, OMP, n, n_threads, end - start);
 
     return isSym;
@@ -217,7 +217,7 @@ void matTransposeOMP(float** M, float** T, int n){
 
 
     double end = omp_get_wtime();
-    int n_threads = getenv("OMP_NUM_THREADS");
+    int n_threads = atoi(getenv("OMP_NUM_THREADS"));
     print_log_omp(omp_log, "OMP Parallelized Transposition", TRANSPOSITION, OMP, n, n_threads, end - start);
 }
 
