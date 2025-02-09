@@ -119,7 +119,7 @@ void matTransposeMPI(float* M, float* T, int mat_size, int rank, int n_cpus) {
     double start_compute = MPI_Wtime();
     for (int i = 0; i < mat_size; i++) {
         for (int j = 0; j < chunk_size; j++) {
-            local_T[j * mat_size + i] = local_M[i * cols + j];
+            local_T[j * mat_size + i] = local_M[i * chunk_size + j];
         }
     }
     double end_compute = MPI_Wtime();
