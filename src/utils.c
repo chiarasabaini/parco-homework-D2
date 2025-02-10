@@ -77,7 +77,7 @@ FILE* init_log(impl_t impl) {
             fprintf(log, "Matrix Size,Function,Implementation,Execution Time\n");
             break;
         case MPI:
-            fprintf(log, "Matrix Size,CPUs,Function,Implementation,MPI Implementation,Execution Time (total), Execution Time (no msg)\n");
+            fprintf(log, "Matrix Size,CPUs,Function,Implementation,MPI Implementation,Execution Time, Execution Time (no msg)\n");
             break;
         case OMP:
             fprintf(log, "Matrix Size,Threads,Function,Implementation,Execution Time\n");
@@ -115,7 +115,7 @@ void print_log_mpi(FILE* log, const char* msg, func_t func, impl_t imp, mpi_t mp
         printf("%s:\n\tmatrix size: %d\n\tn_cpus: %d\n\texecution time tot:%f\n\texecution time no msg:%f\n", msg, size, n_cpus, execution_time_tot, execution_time_no_msg);
     #endif
 
-    fprintf(log, "%d,%d,%s,%s,%s,%0.9f\n", size, n_cpus, func2str(func), imp2str(imp), mpi2str(mpi_type), execution_time_tot, execution_time_no_msg);
+    fprintf(log, "%d,%d,%s,%s,%s,%0.9f,%0.9f\n", size, n_cpus, func2str(func), imp2str(imp), mpi2str(mpi_type), execution_time_tot, execution_time_no_msg);
 }
 
 
