@@ -87,16 +87,10 @@ bool checkSymMPI(float* M, int n, int rank, int n_cpus) {
     if (rank== 0) {
         end_compute = MPI_Wtime();
     }
-    printf("Rank %d: Before MPI_Allreduce, localSym = %d\n", rank, localSym);
-    fflush(stdout); // Important to flush output
 
     MPI_Barrier(MPI_COMM_WORLD);
-    printf("Rank %d: post barrier, localSym = %d\n", rank, localSym);
-    fflush(stdout); //
-    MPI_Allreduce(&localSym, &isSym, 1, MPI_C_BOOL, MPI_LAND, MPI_COMM_WORLD);
 
-    printf("Rank %d: After MPI_Allreduce, isSym = %d\n", rank, isSym);
-    fflush(stdout);
+    MPI_Allreduce(&localSym, &isSym, 1, MPI_C_BOOL, MPI_LAND, MPI_COMM_WORLD);
 
     if (rank == 0) {
         end_total = MPI_Wtime();
@@ -138,8 +132,6 @@ void matTransposeMPI(float* M, float* T, int mat_size, int rank, int n_cpus) {
     // scattering columns to all cpus
     float* local_M = new_mat(chunk_size, mat_size);
     MPI_Scatterv(M, counts, offset, resized_cols_type, local_M, chunk_size * mat_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
-    //printf("Process %d received in local_matrix after SCATTERV:\n", rank);
-    //print_matrix(local_M, N, chunk_size);
 
     // local chunk transpose
     float* local_T = new_mat(mat_size, chunk_size);
@@ -154,8 +146,7 @@ void matTransposeMPI(float* M, float* T, int mat_size, int rank, int n_cpus) {
     if (rank == 0) {
         end_compute = MPI_Wtime();
     }
-    //printf("Process %d local_T after transpose:\n", rank);
-    //print_matrix(local_T, chunk_size, N);
+
 
     // gather transposed chunk
     MPI_Gather(local_T, mat_size * chunk_size, MPI_FLOAT, T, mat_size * chunk_size, MPI_FLOAT, 0, MPI_COMM_WORLD);

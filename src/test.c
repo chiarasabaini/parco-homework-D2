@@ -12,14 +12,6 @@ void test_performance(int rank, int size){
     int min_mat_size = get_min_mat_size();
 
     for(int mat_size = min_mat_size; mat_size <= MAX_MAT_SIZE; mat_size *= 2){
-
-        // if (size > mat_size) {
-        //     if (rank == 0) {
-        //         printf("Processes must be less then matrix size");
-        //     }
-        //     MPI_Finalize();
-        //     exit(1);
-        // }
         float* M = NULL;
         float* T = NULL;
         if (rank==0){
@@ -44,7 +36,6 @@ void test_performance(int rank, int size){
             // TASK 2: parallelization using MPI
             
             checkSymMPI(M, mat_size, rank, size);
-
             matTransposeMPI(M, T, mat_size, rank, size);
             if(rank == 0) {
                 check_transpose(M, T, mat_size);

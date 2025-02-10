@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "matrix_operations.h"
 #include <mpi.h>
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 
