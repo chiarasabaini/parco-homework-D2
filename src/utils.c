@@ -182,3 +182,9 @@ int get_num_threads() {
         return 1;
     }
 }
+
+int get_min_mat_size() {
+    int n_cpus;
+    MPI_Comm_size(MPI_COMM_WORLD, &n_cpus);
+    return MIN_MAT_SIZE > n_cpus ? MIN_MAT_SIZE : n_cpus;
+}

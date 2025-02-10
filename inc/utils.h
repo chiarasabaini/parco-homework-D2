@@ -165,4 +165,6 @@ void print_log_mpi(FILE* log, const char* msg, func_t func, impl_t imp, mpi_t mp
 
 int get_num_threads();
 
+int get_min_mat_size();
+
 #endif // UTILS_H

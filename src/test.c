@@ -9,8 +9,9 @@
  * @param T matrix
  */    
 void test_performance(int rank, int size){
+    int min_mat_size = get_min_mat_size();
 
-    for(int mat_size = MIN_MAT_SIZE; mat_size <= MAX_MAT_SIZE; mat_size *= 2){
+    for(int mat_size = min_mat_size; mat_size <= MAX_MAT_SIZE; mat_size *= 2){
 
         // if (size > mat_size) {
         //     if (rank == 0) {
