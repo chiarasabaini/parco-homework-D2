@@ -6,24 +6,20 @@
 #include <stdlib.h>
 
 int main(int argc, char* argv[]) {
-    
+    srand(time(NULL));
     MPI_Init(&argc, &argv);
-
-    seq_log = init_log(SEQUENTIAL);
-    mpi_log = init_log(MPI);
-    omp_log = init_log(OMP);
-
-    
 
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    seq_log = init_log(SEQUENTIAL);
+    mpi_log = init_log(MPI);
+    omp_log = init_log(OMP);
     
     for(int i=0; i < 5; i++){
         test_performance(rank, size);
     }
-
-    test_performance(rank, size);
     
     MPI_Barrier(MPI_COMM_WORLD);
 

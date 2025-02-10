@@ -11,57 +11,93 @@
 void test_performance(int rank, int size){
 
     for(int mat_size = MIN_MAT_SIZE; mat_size <= MAX_MAT_SIZE; mat_size *= 2){
+
+        // if (size > mat_size) {
+        //     if (rank == 0) {
+        //         printf("Processes must be less then matrix size");
+        //     }
+        //     MPI_Finalize();
+        //     exit(1);
+        // }
+        float* M = NULL;
+        float* T = NULL;
         if (rank==0){
-
-            float* M = new_mat(mat_size, mat_size);
-            float* T = new_mat(mat_size, mat_size);
-
-            // test symmetry check
-            for (int i = 0; i < 5; i++) {
+            M = new_mat(mat_size, mat_size);
+            T = new_mat(mat_size, mat_size);
+        }
+        
+        // test symmetry check
+        for (int i = 0; i < 5; i++) {
+            if(rank == 0) {
                 init_symmetric_mat(M, mat_size);
+            }
 
-                // TASK 1: sequential code
+            // TASK 1: sequential code
+            if(rank == 0) {
                 checkSym(M, mat_size);
                 matTranspose(M, T, mat_size);
                 check_transpose(M, T, mat_size);
-                // print_matrix(T, size);
+            }
+            // print_matrix(T, size);
 
-                // TASK 2: parallelization using MPI
-                checkSymMPI(M, mat_size, rank, size);
-                matTransposeMPI(M, T, mat_size, rank, size);
+            // TASK 2: parallelization using MPI
+            
+            checkSymMPI(M, mat_size, rank, size);
+
+            matTransposeMPI(M, T, mat_size, rank, size);
+            if(rank == 0) {
                 check_transpose(M, T, mat_size);
-                // print_matrix(T, size);
-
-                
-                // TASK 4: parallelization using OMP
+            }
+            
+            // TASK 4: parallelization using OMP
+            if(rank == 0) {
                 checkSymOMP(M, mat_size);
                 matTransposeOMP(M, T, mat_size);
                 check_transpose(M, T, mat_size);
-
             }
 
-            for (int i = 0; i < 5; i++) {
+        }
+        // if(rank == 0) {
+        //     if (M != NULL) {
+        //         free_mat(M, mat_size);
+        //     }
+        //     if (T != NULL) {
+        //         free_mat(T, mat_size);
+        //     }
+        // }
+
+        for (int i = 0; i < 5; i++) {
+            if(rank == 0) {
                 init_mat(M, mat_size);
-                
-                // TASK 1: sequential matrix transposition
+            }
+            
+            // TASK 1: sequential matrix transposition
+            if(rank == 0) {
                 matTranspose(M, T, mat_size);
                 check_transpose(M, T, mat_size);
-                // print_matrix(T, size);
+            }
 
-                // TASK 2: parallelization using MPI
-                matTransposeMPI(M, T, mat_size, rank, size);
+            // TASK 2: parallelization using MPI
+            matTransposeMPI(M, T, mat_size, rank, size);
+            if(rank == 0) {
                 check_transpose(M, T, mat_size);
+            }
 
-                matTransposeMPI_Bcast(M, T, mat_size, rank, size);
+            matTransposeMPI_Bcast(M, T, mat_size, rank, size);
+            if(rank == 0) {
                 check_transpose(M, T, mat_size);
-                // print_matrix(T, size);
+            }
+            // print_matrix(T, size);
 
-                // TASK 4: parallelization using OMP
+            // TASK 4: parallelization using OMP
+            if(rank == 0) {
                 matTransposeOMP(M, T, mat_size);
                 check_transpose(M, T, mat_size);
-                // print_matrix(T, size);
             }
-            // free matrices memory
+            // print_matrix(T, size);
+        }
+        // free matrices memory
+        if(rank == 0) {
             if (M != NULL) {
                 free_mat(M, mat_size);
             }

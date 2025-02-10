@@ -61,7 +61,7 @@ FILE* init_log(impl_t impl) {
     char time_string[32];
     strftime(time_string, 32, "%Y%m%d_%H%M%S", time_info);
 
-    // int n_threads = atoi(getenv("OMP_NUM_THREADS"));
+    // int n_threads = get_num_threads();
     int n_cpus;
     MPI_Comm_size(MPI_COMM_WORLD, &n_cpus);
 
@@ -146,8 +146,6 @@ float* new_mat(int rows, int cols) {
 
 
 void init_mat(float* M, int n) {
-    srand(time(NULL));
-
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             M[i * n + j] = fabs((float)rand()) / RAND_MAX; // Correct indexing
@@ -174,4 +172,13 @@ void init_symmetric_mat(float* M, int n) {
 // function to free dynamically allocated memory for matrix
 void free_mat(float* M, int rows) {
     free(M);
+}
+
+int get_num_threads() {
+    const char *env_threads = getenv("OMP_NUM_THREADS");
+    if(env_threads) {
+        return atoi(env_threads);
+    }  else {
+        return 1;
+    }
 }

@@ -163,4 +163,6 @@ void print_log_omp(FILE *log, const char *msg, func_t func, impl_t imp, int size
  */
 void print_log_mpi(FILE* log, const char* msg, func_t func, impl_t imp, mpi_t mpi_type, int size, int n_cpus, double execution_time_tot, double execution_time_no_msg);
 
+int get_num_threads();
+
 #endif // UTILS_H

@@ -49,19 +49,32 @@ void matTranspose(float* M, float* T, int n) {
 
 // TASK 2
 bool checkSymMPI(float* M, int n, int rank, int n_cpus) {
-    double start_total = MPI_Wtime();
+    double start_total, end_total, start_compute, end_compute;
 
-    int chunk_size = (n - 1) / n_cpus;
-    int start_row = rank * chunk_size;
-    int end_row = (rank == n_cpus - 1) ? (n - 1) : (start_row + chunk_size);
+    if (rank == 0) {
+        start_total = MPI_Wtime();
+    }
 
+    bool isSym = true;
     bool localSym = true;
 
-    double start_compute = MPI_Wtime();
+    int chunk_size = n / n_cpus;
+    int start_row = rank * chunk_size;
+    int end_row = (rank + 1) * chunk_size;
+
+    if (rank != 0) {
+        M = new_mat(n, n);
+    }
+
+    MPI_Bcast(M, n * n, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    
+    if (rank == 0) {
+        start_compute = MPI_Wtime();
+    }
 
     for (int i = start_row; i <= end_row; ++i) {
         for (int j = i + 1; j < n; ++j) {
-            if (M[i * n + j] != M[j * n + i]) {  // Correct indexing for contiguous array
+            if (M[i * n + j] != M[j * n + i]) {
                 localSym = false;
                 break;
             }
@@ -71,23 +84,37 @@ bool checkSymMPI(float* M, int n, int rank, int n_cpus) {
         }
     }
 
-    double end_compute = MPI_Wtime();
+    if (rank== 0) {
+        end_compute = MPI_Wtime();
+    }
+    printf("Rank %d: Before MPI_Allreduce, localSym = %d\n", rank, localSym);
+    fflush(stdout); // Important to flush output
 
-    bool isSym = false;
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Rank %d: post barrier, localSym = %d\n", rank, localSym);
+    fflush(stdout); //
     MPI_Allreduce(&localSym, &isSym, 1, MPI_C_BOOL, MPI_LAND, MPI_COMM_WORLD);
 
-    MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have finished before timing ends
+    printf("Rank %d: After MPI_Allreduce, isSym = %d\n", rank, isSym);
+    fflush(stdout);
 
-    double end_total = MPI_Wtime();
-    print_log_mpi(mpi_log, "MPI Parallelized Symmetry Check", SYMMETRY, MPI, REDUCE, n, n_cpus, end_total - start_total, end_compute - start_compute);
+    if (rank == 0) {
+        end_total = MPI_Wtime();
+        print_log_mpi(mpi_log, "MPI Parallelized Symmetry Check", SYMMETRY, MPI, REDUCE, n, n_cpus, end_total - start_total, end_compute - start_compute);
+    } else {
+        free_mat(M, n);
+    }
 
     return isSym;
 }
 
 // MPI Scatter - Gather with Datatypes
 void matTransposeMPI(float* M, float* T, int mat_size, int rank, int n_cpus) {
-    double start_total = MPI_Wtime();
+    double start_total, end_total, start_compute, end_compute;
 
+    if (rank == 0) {
+        start_total = MPI_Wtime();
+    }
     int chunk_size = mat_size / n_cpus; // elements per chunk (columns per cpu)
 
     // create datatype to scatter
@@ -116,13 +143,17 @@ void matTransposeMPI(float* M, float* T, int mat_size, int rank, int n_cpus) {
 
     // local chunk transpose
     float* local_T = new_mat(mat_size, chunk_size);
-    double start_compute = MPI_Wtime();
+    if (rank == 0) {
+        start_compute = MPI_Wtime();
+    }
     for (int i = 0; i < mat_size; i++) {
         for (int j = 0; j < chunk_size; j++) {
             local_T[j * mat_size + i] = local_M[i * chunk_size + j];
         }
     }
-    double end_compute = MPI_Wtime();
+    if (rank == 0) {
+        end_compute = MPI_Wtime();
+    }
     //printf("Process %d local_T after transpose:\n", rank);
     //print_matrix(local_T, chunk_size, N);
 
@@ -133,15 +164,20 @@ void matTransposeMPI(float* M, float* T, int mat_size, int rank, int n_cpus) {
     free_mat(local_T, mat_size);
     MPI_Type_free(&resized_cols_type);
 
-    double end_total = MPI_Wtime();
-    print_log_mpi(mpi_log, "MPI Parallelized Transposition", TRANSPOSITION, MPI, SCATTER, mat_size, n_cpus, end_total - start_total, end_compute - start_compute);
+    if (rank == 0) {
+        double end_total = MPI_Wtime();
+        print_log_mpi(mpi_log, "MPI Parallelized Transposition", TRANSPOSITION, MPI, SCATTER, mat_size, n_cpus, end_total - start_total, end_compute - start_compute);
+    }
 }
 
 
 // MPI Broadcast
 void matTransposeMPI_Bcast(float* M, float* T, int mat_size, int rank, int n_cpus){
-    double start_total = MPI_Wtime();
+    double start_total, end_total, start_compute, end_compute;
 
+    if (rank == 0) {
+        start_total = MPI_Wtime();
+    }
     int chunk_size = mat_size / n_cpus;
     int start = rank * chunk_size;
     int end   = start + chunk_size;
@@ -154,8 +190,9 @@ void matTransposeMPI_Bcast(float* M, float* T, int mat_size, int rank, int n_cpu
     MPI_Bcast(M, mat_size * mat_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
     // local chunk transpose
-    double start_compute = MPI_Wtime();
-
+    if (rank == 0) {
+        start_compute = MPI_Wtime();
+    }
     float* local_T = new_mat(chunk_size, mat_size);
     for (int i = start; i < end; i++) {
         for (int j = 0; j < mat_size; j++) {
@@ -163,7 +200,9 @@ void matTransposeMPI_Bcast(float* M, float* T, int mat_size, int rank, int n_cpu
         }
     }
 
-    double end_compute = MPI_Wtime();
+    if (rank == 0) {
+        end_compute = MPI_Wtime();
+    }
 
     // gather transposed chunk
     MPI_Gather(local_T,  chunk_size * mat_size, MPI_FLOAT, T, chunk_size * mat_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
@@ -172,9 +211,10 @@ void matTransposeMPI_Bcast(float* M, float* T, int mat_size, int rank, int n_cpu
     if (rank != 0) {
         free_mat(M, mat_size);
     }
-
-    double end_total = MPI_Wtime();
-    print_log_mpi(mpi_log, "MPI Parallelized Transposition", TRANSPOSITION, MPI, BROADCAST, mat_size, n_cpus, end_total - start_total, end_compute - start_compute);
+    if (rank == 0) {
+        end_total = MPI_Wtime();
+        print_log_mpi(mpi_log, "MPI Parallelized Transposition", TRANSPOSITION, MPI, BROADCAST, mat_size, n_cpus, end_total - start_total, end_compute - start_compute);
+    }
 }
 
 
@@ -197,7 +237,8 @@ bool checkSymOMP(float* M, int n) {
     }
 
     double end = omp_get_wtime();
-    int n_threads = atoi(getenv("OMP_NUM_THREADS"));
+    int n_threads = get_num_threads();
+
     print_log_omp(omp_log, "OMP Parallelized Symmetry Check", SYMMETRY, OMP, n, n_threads, end - start);
 
     return isSym;
@@ -218,7 +259,7 @@ void matTransposeOMP(float* M, float* T, int n){
 
 
     double end = omp_get_wtime();
-    int n_threads = atoi(getenv("OMP_NUM_THREADS"));
+    int n_threads = get_num_threads();
     print_log_omp(omp_log, "OMP Parallelized Transposition", TRANSPOSITION, OMP, n, n_threads, end - start);
 }
 
