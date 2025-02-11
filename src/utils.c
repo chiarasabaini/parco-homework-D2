@@ -74,7 +74,7 @@ FILE* init_log(impl_t impl) {
     } else {
         switch(impl){
         case SEQUENTIAL:
-            fprintf(log, "Matrix Size,Function,Implementation,Execution Time\n");
+            fprintf(log, "Matrix Size,CPUs/Threads,Function,Implementation,Execution Time\n");
             break;
         case MPI:
             fprintf(log, "Matrix Size,CPUs,Function,Implementation,MPI Implementation,Execution Time, Execution Time (no msg)\n");
@@ -89,13 +89,13 @@ FILE* init_log(impl_t impl) {
 }
 
 
-void print_log_seq(FILE* log, const char* msg, func_t func, impl_t imp, int size, double execution_time) {
+void print_log_seq(FILE* log, const char* msg, func_t func, impl_t imp, int size, int n_procs, double execution_time) {
 
     #if LOG_DEBUG == 1
         printf("%s:\n\tmatrix size: %d\nexecution time:%f\n", msg, size, execution_time);
     #endif
 
-    fprintf(log, "%d,%s,%s,%0.9f\n", size, func2str(func), imp2str(imp), execution_time);
+    fprintf(log, "%d,%d,%s,%s,%0.9f\n", size, n_procs, func2str(func), imp2str(imp), execution_time);
 }
 
 

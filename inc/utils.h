@@ -132,7 +132,7 @@ void close_log(FILE *log);
  * @param size matrix size
  * @param execution_time time elapsed between start and end of execution of the function
  */
-void print_log_seq(FILE* log, const char* msg, func_t func, impl_t imp, int size, double execution_time);
+void print_log_seq(FILE* log, const char* msg, func_t func, impl_t imp, int size, int n_procs, double execution_time);
 
 
 /**

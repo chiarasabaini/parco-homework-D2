@@ -27,7 +27,10 @@ bool checkSym(float* M, int n) {
     }
 
     double end = omp_get_wtime();
-    print_log_seq(seq_log, "Sequential Symmetry Check", SYMMETRY, SEQUENTIAL, n, end - start);
+
+    int n_procs;
+    MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+    print_log_seq(seq_log, "Sequential Symmetry Check", SYMMETRY, SEQUENTIAL, n, n_procs, end - start);
 
     return isSym;
 }
@@ -43,7 +46,10 @@ void matTranspose(float* M, float* T, int n) {
     }
 
     double end = omp_get_wtime();
-    print_log_seq(seq_log, "Sequential Transposition", TRANSPOSITION, SEQUENTIAL, n, end - start);
+
+    int n_procs;
+    MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+    print_log_seq(seq_log, "Sequential Transposition", TRANSPOSITION, SEQUENTIAL, n, n_procs, end - start);
 }
 
 
