@@ -8,5 +8,3 @@ MakeFile
 bin/
 build/
 report/
-
-src/performance_analysis.ipynb
